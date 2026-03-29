@@ -1,26 +1,80 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #F5F0E8;
+  --ink: #1A1410;
+  --rust: #C4441C;
+  --sage: #4A6741;
+  --gold: #C9A84C;
+  --muted: #8A8070;
+  --paper: #EDE8DC;
+  --border: #D4C9B5;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { background: var(--cream); color: var(--ink); }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+.font-display { font-family: 'Playfair Display', serif; }
+.font-mono-custom { font-family: 'DM Mono', monospace; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fade-up { animation: fadeUp 0.5s ease forwards; }
+.animate-fade-up-d1 { animation: fadeUp 0.5s ease 0.1s forwards; opacity: 0; }
+.animate-fade-up-d2 { animation: fadeUp 0.5s ease 0.2s forwards; opacity: 0; }
+.animate-fade-up-d3 { animation: fadeUp 0.5s ease 0.3s forwards; opacity: 0; }
+.animate-fade-up-d4 { animation: fadeUp 0.5s ease 0.4s forwards; opacity: 0; }
+
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--paper) 25%, var(--border) 50%, var(--paper) 75%);
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--cream);
+  padding: 3px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  border-radius: 2px;
+  margin: 3px;
+}
+
+.result-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--rust);
 }
