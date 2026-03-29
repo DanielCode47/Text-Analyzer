@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
+// Make sure you have ANTHROPIC_API_KEY in your .env.local file!
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
-  const { text } = await req.json()
-  if (!text?.trim()) return NextResponse.json({ error: 'No text provided' }, { status: 400 })
+  try {
+    const { text } = await req.json()
+    if (!text?.trim()) return NextResponse.json({ error: 'No text provided' }, { status: 400 })
 
-  const prompt = `Analyze the following text and respond ONLY with a valid JSON object — no preamble, no markdown, no backticks.
+    const prompt = `Analyze the following text and respond ONLY with a valid JSON object — no preamble, no markdown, no backticks.
 
 The JSON must follow this exact structure:
 {
@@ -30,13 +32,25 @@ Text to analyze:
 ${text.slice(0, 8000)}
 """`
 
-  const message = await client.messages.create({
-    model: 'claude-opus-4-5',
-    max_tokens: 1024,
-    messages: [{ role: 'user', content: prompt }],
-  })
+    const message = await client.messages.create({
+      model: 'claude-3-5-sonnet-20241022', // FIXED: Valid model name
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }],
+    })
 
-  const raw = (message.content[0] as { type: string; text: string }).text.trim()
-  const parsed = JSON.parse(raw)
-  return NextResponse.json(parsed)
+    let raw = (message.content[0] as { type: string; text: string }).text.trim()
+    
+    // SAFETY NET: Strip markdown formatting if Claude disobeys instructions
+    if (raw.startsWith('```')) {
+      raw = raw.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+    }
+
+    const parsed = JSON.parse(raw)
+    return NextResponse.json(parsed)
+
+  } catch (error) {
+    // This will print the exact Anthropic error in your local terminal!
+    console.error("API Error details:", error);
+    return NextResponse.json({ error: 'Failed to analyze text' }, { status: 500 })
+  }
 }
